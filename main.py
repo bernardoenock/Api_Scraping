@@ -27,6 +27,7 @@ def iniciar_bot():
     driver = webdriver.Remote(command_executor=selenium_host, options=chrome_options)
     
     try:
+        driver.get('https://github.com/bernardoenock')
         html_source = get_page_source(driver, logger)
         time.sleep(2)
 
