@@ -1,0 +1,20 @@
+services:
+  fastapi-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fastapi-app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - selenium
+    environment:
+      - SELENIUM_HOST=selenium
+      - SELENIUM_PORT=4444
+
+  selenium:
+    image: selenium/standalone-chrome
+    container_name: selenium
+    ports:
+      - "4444:4444"
+    shm_size: "2g"
