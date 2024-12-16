@@ -2,3 +2,4 @@ fastapi
 selenium
 uvicorn
 requests
+beautifulsoup4
