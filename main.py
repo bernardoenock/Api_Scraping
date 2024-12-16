@@ -1,16 +1,23 @@
 import logging
-from fastapi import FastAPI
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
 import time
 
+from fastapi import FastAPI
+from pydantic import BaseModel
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+
 from scraping import get_page_source
+from colector.html_colector import HTMLColectorFactory
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
+
+class ColectHTMLRequest(BaseModel):
+    url: str
+    engine: str # selenium or bs4
 
 @app.get("/")
 def home():
@@ -42,3 +49,13 @@ def iniciar_bot():
         logger.info("Browser closed")
 
     return {"html": html_source}
+
+@app.post("/colect-html/v2")
+def collect_html(request: ColectHTMLRequest):
+    try:
+        strategy = HTMLColectorFactory.create_strategy(request.engine.lower(), logger)
+        html_source = strategy.collect_html(request.url, logger)
+        return { "html": html_source }
+    except Exception as e:
+        logger.error(f"Error during scraping: {e}")
+        return {"error": str(e)}
